@@ -3,7 +3,7 @@ import {asyncHandler} from "../utils/asyncHandler.js"
 import {User} from "../models/user.model.js"
 import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { response } from "express";
+
 
 const registerUser = asyncHandler(async(req,res)=>{
     //get user details from frontend
@@ -17,7 +17,7 @@ const registerUser = asyncHandler(async(req,res)=>{
     // return response
 
     const {fullname, username, email, password} = req.body
-    console.log("emial:",email);
+    console.log("email:",email);
 
     if (
         [fullname, email, username, password].some((field)=>field?.trim() === "")
@@ -25,7 +25,7 @@ const registerUser = asyncHandler(async(req,res)=>{
             throw new ApiError(400,"All fields are required")
         }
     
-    const existedUser = User.findOne({
+    const existedUser = await User.findOne({
         $or:[{ email }, { username }]
     })
 
@@ -33,24 +33,29 @@ const registerUser = asyncHandler(async(req,res)=>{
         throw new ApiError(409,"User with email or username exists")
     }
 
-    const avatarLocalPath = req.files?.avatar[0]?.path ;
-    const coverImageLocalPath = req.files?.coverImage[0]?.path ;
+    const avatarLocalPath =  req.files?.avatar ? req.files?.avatar[0]?.path : null;
+    const coverImageLocalPath =  req.files?.coverImage ? req.files?.coverImage[0]?.path : null;
 
     if (!avatarLocalPath){
         throw new ApiError(400,"Avatar file is required")
+        console.log("avatarLocalPath:", avatarLocalPath)
+
     }
 
+
     const avatar = await uploadOnCloudinary(avatarLocalPath);
-    const coverImage = await uploadOnCloudinary(coverImageLocalPath);
+    const coverImage = coverImageLocalPath ? await uploadOnCloudinary(coverImageLocalPath) : null;
+
 
     if (!avatar){
         throw new ApiError(400,"Avatar file is required")
-    }
+        console.log("avatar after upload:", avatar);
 
+    }
     const user = await User.create({
         fullname,
         avatar: avatar.url,
-        coverImage: coverImage.url || "",
+        coverImage: coverImage?.url || "",
         email,
         username: username.toLowerCase(),
         password
@@ -67,10 +72,6 @@ const registerUser = asyncHandler(async(req,res)=>{
     return res.status(201).json(
         new ApiResponse(200,createdUser, "User registered Successfully")
     )
-
-
-
-    
 
 })
 
