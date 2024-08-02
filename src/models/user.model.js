@@ -50,12 +50,15 @@ const userSchema = new Schema(
 );
 
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return mext();
-  this.password = bcrypt.hash(this.password, 10);
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
   next();
 });
 
 userSchema.methods.isPasswordCorrect = async function (password) {
+  if (!password || !this.password) {
+    throw new Error("Password or stored hash is missing");
+  }
   return await bcrypt.compare(password, this.password);
 };
 
