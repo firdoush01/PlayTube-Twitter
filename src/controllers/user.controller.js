@@ -127,7 +127,7 @@ const loginUser = asyncHandler(async(req,res)=>{
 
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
-    const options = {
+    const options = {     //for cookies, now cookies are only modified by the server
         httpOnly: true,
         secure: true
     }
@@ -333,7 +333,7 @@ const getUserChanelProfile = asyncHandler(async(req,res)=>{
             }
         },
         {
-            $lookup: {
+            $lookup: {   // getting no of subscribers of user
                 from: "subscriptions",
                 localField: "_id",
                 foreignField: "chanel",
@@ -342,7 +342,7 @@ const getUserChanelProfile = asyncHandler(async(req,res)=>{
         },
 
         {
-            $lookup: {
+            $lookup: {   // getting no of chanels user has subscribed to
                 from: "subscriptions",
                 localField: "_id",
                 foreignField: "subscribers",
@@ -350,7 +350,7 @@ const getUserChanelProfile = asyncHandler(async(req,res)=>{
         }
         },
         {
-            $addFields: {
+            $addFields: {    // added several other fields
                 subscibersCount: {
                     $size: "$subscribers"
                 },
@@ -367,7 +367,7 @@ const getUserChanelProfile = asyncHandler(async(req,res)=>{
             }
         },
         {
-            $project: {
+            $project: {     // to give selected props at a time
                 fullname: 1,
                 username: 1,
                 subscibersCount: 1,
