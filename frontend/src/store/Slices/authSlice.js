@@ -33,16 +33,46 @@ export const createAccount = createAsyncThunk("register", async (data) => {
 export const userLogin = createAsyncThunk("login", async (data) => {
     try {
         const response = await axiosInstance.post("/users/login", data);
-        return response.data.data.user;
+        const userData = response.data.data.user;
+
+        // Store the token in local storage (or cookies if preferred)
+        if (response.data.data.token) {
+            localStorage.setItem("accessToken", response.data.data.token);
+        }
+
+        return userData;
     } catch (error) {
         toast.error(error?.response?.data?.error);
         throw error;
     }
 });
 
+
+// export const userLogin = createAsyncThunk("login", async (data) => {
+//     try {
+//         const response = await axiosInstance.post("/users/login", data);
+//         return response.data.data.user;
+//     } catch (error) {
+//         toast.error(error?.response?.data?.error);
+//         throw error;
+//     }
+// });
+
+// export const userLogout = createAsyncThunk("logout", async () => {
+//     try {
+//         const response = await axiosInstance.post("/users/logout");
+//         toast.success(response.data?.message);
+//         return response.data;
+//     } catch (error) {
+//         toast.error(error?.response?.data?.error);
+//         throw error;
+//     }
+// });
+
 export const userLogout = createAsyncThunk("logout", async () => {
     try {
         const response = await axiosInstance.post("/users/logout");
+        localStorage.removeItem("accessToken"); // Clear token on logout
         toast.success(response.data?.message);
         return response.data;
     } catch (error) {
@@ -50,6 +80,7 @@ export const userLogout = createAsyncThunk("logout", async () => {
         throw error;
     }
 });
+
 
 export const refreshAccessToken = createAsyncThunk(
     "refreshAccessToken",
