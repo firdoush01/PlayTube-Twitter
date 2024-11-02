@@ -2,7 +2,7 @@
   "name": "laerningbackend",
   "version": "1.0.0",
   "description": "learning backend",
-  "type": "module", 
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "dev": "nodemon -r dotenv/config --experimental-json-modules src/index.js"
@@ -23,10 +23,12 @@
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
-    "express": "^4.19.2",
+    "express": "^5.0.0",
+    "i": "^0.3.7",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.5.1",
     "mongoose-aggregate-paginate-v2": "^1.1.2",
+    "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1"
   }
 }
